@@ -53,12 +53,18 @@ OPENAI_MODEL=gpt-4.1
 
 项目已包含 `vercel.json`。部署时选择 Vite 框架，构建命令为 `npm run build`，输出目录为 `dist`。
 
+推荐直接在 Vercel 控制台导入 GitHub 仓库：
+
+`332165832trump-gif/linear-algebra-learning-platform`
+
 ```bash
 npm install -g vercel
 vercel login
 vercel
 vercel --prod
 ```
+
+更完整的上线检查见 `DEPLOYMENT.md`。
 
 ## GitHub 上传
 
