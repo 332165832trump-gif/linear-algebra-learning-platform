@@ -36,21 +36,18 @@ npm run build
 npm run preview
 ```
 
-## AI 数学导师接口规划
+## AI 数学导师
 
-当前前端已预留 AI 导师输入与上下文结构。后续可增加 `/api/tutor`：
+项目包含 Vercel Serverless API：`api/tutor.js`。前端会把当前模块、课程阶段、公式和用户问题发送到 `/api/tutor`。
 
-```ts
-type TutorRequest = {
-  moduleId: string;
-  stage: string;
-  formula: string;
-  visualState: Record<string, number | string>;
-  question: string;
-};
+本地或 Vercel 环境变量：
+
+```bash
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4.1
 ```
 
-服务端可以把当前动画参数、课程阶段和用户问题一起传给大模型，返回新手解释、公式解释或自动例题。
+如果没有配置 `OPENAI_API_KEY`，接口会返回本地 fallback 解释，方便演示和部署健康检查。
 
 ## Vercel 部署
 

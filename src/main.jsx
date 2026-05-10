@@ -5,8 +5,10 @@ import { BlockMath, InlineMath } from "react-katex";
 import {
   BookOpen,
   Brain,
+  CheckCircle2,
   ChevronRight,
   Compass,
+  GraduationCap,
   Grid3X3,
   History,
   Layers3,
@@ -18,7 +20,6 @@ import {
   Sigma,
   Sparkles,
   Target,
-  TriangleRight,
   Wand2
 } from "lucide-react";
 import "katex/dist/katex.min.css";
@@ -226,8 +227,46 @@ function TeacherPanel({ module, activeStage, setActiveStage }) {
 
 function AiTutorPanel({ module, activeStage }) {
   const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const stage = module.story[activeStage];
-  const sample = `当前我会围绕「${module.title}」解释：先看 ${stage.label}，再把动画里的几何现象翻译成 ${module.formula}。接口已预留，接入后端后可把当前模块、阶段、矩阵参数和用户问题一起发送给 AI。`;
+  const sample = answer || `当前我会围绕「${module.title}」解释：先看 ${stage.label}，再把动画里的几何现象翻译成 ${module.formula}。你可以直接问“为什么这个方向不变”或“给我一道例题”。`;
+
+  const askTutor = async (event) => {
+    event.preventDefault();
+    if (!question.trim() || loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/tutor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          module: {
+            id: module.id,
+            title: module.title,
+            formula: module.formula,
+            stage: stage.label,
+            stageBody: stage.body,
+            geometry: module.geometry,
+            definition: module.definition,
+            misconception: module.misconception,
+            application: module.application
+          }
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "AI 导师暂时不可用");
+      setAnswer(payload.answer);
+      setQuestion("");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="ai-tutor">
@@ -237,16 +276,14 @@ function AiTutorPanel({ module, activeStage }) {
         </div>
         <div>
           <h3>AI 数学导师</h3>
-          <p>已预留接口：解释当前动画、公式，并生成例题。</p>
+          <p>解释当前动画、公式，并生成例题。</p>
         </div>
       </div>
       <div className="ai-answer">{sample}</div>
+      {error ? <div className="ai-error">{error}</div> : null}
       <form
         className="ai-input-row"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setQuestion("");
-        }}
+        onSubmit={askTutor}
       >
         <input
           value={question}
@@ -254,7 +291,7 @@ function AiTutorPanel({ module, activeStage }) {
           placeholder={`问 AI：为什么 ${module.coreQuestion}`}
           aria-label="向 AI 数学导师提问"
         />
-        <button type="submit" title="发送问题">
+        <button type="submit" title="发送问题" disabled={loading}>
           <Send className="h-4 w-4" />
         </button>
       </form>
@@ -367,6 +404,54 @@ function TopHero({ activeModule, setActiveId }) {
   );
 }
 
+function CourseBlueprint({ activeModule }) {
+  const tracks = [
+    ["基础结构", "向量、空间、子空间、基与维数", "建立坐标与自由度语言"],
+    ["变换核心", "矩阵、秩、行列式、方程组", "看懂线性规则如何改变空间"],
+    ["谱理论", "特征值、对角化、Jordan", "找到系统自己的坐标轴"],
+    ["应用桥梁", "二次型、内积、正交化、PCA", "连接优化、机器学习与金融建模"]
+  ];
+  const activePosition = modules.findIndex((module) => module.id === activeModule.id) + 1;
+
+  return (
+    <section className="course-blueprint">
+      <div className="blueprint-head">
+        <div>
+          <div className="section-kicker">
+            <GraduationCap className="h-4 w-4" />
+            University Learning System
+          </div>
+          <h2>从概念直觉到可计算能力的完整学习路径</h2>
+        </div>
+        <div className="blueprint-progress">
+          <span>当前进度</span>
+          <strong>{activePosition}/{modules.length}</strong>
+        </div>
+      </div>
+      <div className="track-grid">
+        {tracks.map(([title, topics, outcome], index) => (
+          <motion.article
+            className="track-card"
+            key={title}
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ delay: index * 0.05 }}
+          >
+            <div className="track-index">{String(index + 1).padStart(2, "0")}</div>
+            <h3>{title}</h3>
+            <p>{topics}</p>
+            <div className="track-outcome">
+              <CheckCircle2 className="h-4 w-4" />
+              {outcome}
+            </div>
+          </motion.article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function FloatingMath() {
   const symbols = ["λ", "det A", "span", "rank", "V", "Aⁿ", "ker", "⟂"];
   return (
@@ -397,6 +482,7 @@ function App() {
     <div className="app-shell min-h-screen text-slate-100">
       <Header activeModule={activeModule} progress={progress} />
       <TopHero activeModule={activeModule} setActiveId={(id) => { setActiveId(id); setActiveStage(0); }} />
+      <CourseBlueprint activeModule={activeModule} />
       <main className="mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 pb-16 sm:px-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <ModuleNav activeId={activeId} setActiveId={(id) => { setActiveId(id); setActiveStage(0); }} />
         <div className="min-w-0">

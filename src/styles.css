@@ -247,6 +247,114 @@ input {
   background: rgba(216, 230, 243, 0.18);
 }
 
+.course-blueprint {
+  width: min(1280px, calc(100% - 32px));
+  margin: 0 auto 28px;
+}
+
+.blueprint-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cyanGlow);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.blueprint-head h2 {
+  margin-top: 8px;
+  max-width: 720px;
+  color: white;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 750;
+}
+
+.blueprint-progress {
+  min-width: 120px;
+  border: 1px solid rgba(216, 230, 243, 0.14);
+  border-radius: 18px;
+  background: rgba(6, 10, 20, 0.54);
+  padding: 12px 14px;
+  text-align: right;
+}
+
+.blueprint-progress span {
+  display: block;
+  color: rgb(148 163 184);
+  font-size: 11px;
+}
+
+.blueprint-progress strong {
+  display: block;
+  margin-top: 2px;
+  color: white;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.track-card {
+  border: 1px solid rgba(216, 230, 243, 0.12);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.026)),
+    rgba(10, 16, 31, 0.68);
+  padding: 17px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+}
+
+.track-index {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(96, 165, 250, 0.13);
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.track-card h3 {
+  margin-top: 14px;
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.track-card p {
+  margin-top: 8px;
+  min-height: 48px;
+  color: rgb(203 213 225);
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+.track-outcome {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  color: rgb(110 231 183);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .nav-item {
   display: grid;
   width: 100%;
@@ -425,6 +533,14 @@ input {
     radial-gradient(circle at 50% 28%, rgba(96, 165, 250, 0.18), transparent 18rem),
     radial-gradient(circle at 70% 72%, rgba(192, 132, 252, 0.12), transparent 16rem),
     #070a12;
+}
+
+.three-scene-loading {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  color: rgb(203 213 225);
+  font-size: 13px;
 }
 
 .three-scene canvas {
@@ -725,6 +841,17 @@ input[type="range"] {
   line-height: 1.75;
 }
 
+.ai-error {
+  margin-top: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.08);
+  padding: 10px 12px;
+  color: rgb(254 202 202);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .ai-input-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 42px;
@@ -757,6 +884,11 @@ input[type="range"] {
   color: white;
 }
 
+.ai-input-row button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
 .detail-card h3 {
   color: white;
   font-size: 14px;
@@ -774,6 +906,10 @@ input[type="range"] {
   .hero-grid,
   .learning-shell {
     grid-template-columns: 1fr;
+  }
+
+  .track-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .module-nav {
@@ -795,6 +931,19 @@ input[type="range"] {
 @media (max-width: 680px) {
   .hero {
     padding-top: 52px;
+  }
+
+  .blueprint-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .blueprint-progress {
+    text-align: left;
+  }
+
+  .track-grid {
+    grid-template-columns: 1fr;
   }
 
   .hero h1 {
