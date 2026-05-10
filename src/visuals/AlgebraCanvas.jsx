@@ -26,12 +26,26 @@ function useTicker(playing) {
   const [time, setTime] = useState(0);
   useEffect(() => {
     if (!playing) return undefined;
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    if (prefersReducedMotion) return undefined;
     let frame;
     let last = performance.now();
+    let lastCommit = last;
+    let pending = 0;
     const tick = (now) => {
+      if (document.hidden) {
+        last = now;
+        frame = requestAnimationFrame(tick);
+        return;
+      }
       const delta = Math.min(0.034, (now - last) / 1000);
       last = now;
-      setTime((current) => current + delta);
+      pending += delta;
+      if (now - lastCommit >= 33) {
+        setTime((current) => current + pending);
+        pending = 0;
+        lastCommit = now;
+      }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);

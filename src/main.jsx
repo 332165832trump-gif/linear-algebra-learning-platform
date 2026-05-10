@@ -170,7 +170,6 @@ function TeacherPanel({ module, activeStage, setActiveStage }) {
   const stage = module.story[activeStage];
   return (
     <motion.section
-      layout
       className="teacher-panel"
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}

@@ -15,8 +15,12 @@ export function ThreeMathScene({ module }) {
     camera.position.set(5.8, 4.2, 7.2);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
 
@@ -57,7 +61,7 @@ export function ThreeMathScene({ module }) {
     const surfaces = [];
 
     if (module.id === "quadratic-form") {
-      const geometry = new THREE.PlaneGeometry(5.2, 5.2, 48, 48);
+      const geometry = new THREE.PlaneGeometry(5.2, 5.2, 28, 28);
       geometry.rotateX(-Math.PI / 2);
       const material = new THREE.MeshStandardMaterial({
         color: 0x5ea6ff,
@@ -76,8 +80,8 @@ export function ThreeMathScene({ module }) {
     } else if (module.id === "pca") {
       const cloud = new THREE.Group();
       const dotMaterial = new THREE.MeshStandardMaterial({ color: 0x6ee7b7, emissive: 0x0a463a, roughness: 0.25 });
-      const dotGeometry = new THREE.SphereGeometry(0.045, 10, 10);
-      for (let i = 0; i < 130; i += 1) {
+      const dotGeometry = new THREE.SphereGeometry(0.045, 8, 8);
+      for (let i = 0; i < 72; i += 1) {
         const t = i * 0.37;
         const radius = 0.45 + (i % 11) * 0.055;
         const x = Math.cos(t) * radius * 2.4;
@@ -122,7 +126,7 @@ export function ThreeMathScene({ module }) {
 
     const stars = new THREE.Points(
       new THREE.BufferGeometry().setFromPoints(
-        Array.from({ length: 220 }, () => new THREE.Vector3((Math.random() - 0.5) * 28, Math.random() * 12 - 2, (Math.random() - 0.5) * 28))
+        Array.from({ length: 90 }, () => new THREE.Vector3((Math.random() - 0.5) * 28, Math.random() * 12 - 2, (Math.random() - 0.5) * 28))
       ),
       new THREE.PointsMaterial({ color: 0xd8e6f3, transparent: true, opacity: 0.28, size: 0.018 })
     );
@@ -139,9 +143,12 @@ export function ThreeMathScene({ module }) {
     resize();
 
     let frame = 0;
-    const animate = () => {
-      frame = requestAnimationFrame(animate);
-      const t = performance.now() / 1000;
+    let lastRender = 0;
+    let sceneVisible = true;
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+    const renderFrame = (now = performance.now()) => {
+      const t = now / 1000;
       root.rotation.y = Math.sin(t * 0.18) * 0.18;
       stars.rotation.y = t * 0.012;
       arrows.forEach((arrow, index) => {
@@ -164,14 +171,48 @@ export function ThreeMathScene({ module }) {
       });
       renderer.render(scene, camera);
     };
-    animate();
+
+    const tick = (now) => {
+      frame = 0;
+      if (!sceneVisible || document.hidden) return;
+      if (now - lastRender >= 33) {
+        renderFrame(now);
+        lastRender = now;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (!frame && !prefersReducedMotion && sceneVisible && !document.hidden) {
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    renderFrame();
+    start();
 
     const observer = new ResizeObserver(resize);
     observer.observe(mount);
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        sceneVisible = entry?.isIntersecting ?? true;
+        if (!sceneVisible && frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+        }
+        start();
+      },
+      { rootMargin: "160px" }
+    );
+    visibilityObserver.observe(mount);
+    const onVisibilityChange = () => start();
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
       scene.traverse((object) => {
         object.geometry?.dispose?.();

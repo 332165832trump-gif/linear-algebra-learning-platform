@@ -22,9 +22,15 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: auto;
+  overflow-anchor: none;
+}
+
 body {
   margin: 0;
   min-width: 320px;
+  overflow-anchor: none;
   background:
     radial-gradient(circle at 18% 8%, rgba(96, 165, 250, 0.22), transparent 32rem),
     radial-gradient(circle at 82% 18%, rgba(192, 132, 252, 0.16), transparent 28rem),
@@ -128,7 +134,7 @@ input {
     radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.13), transparent 16rem),
     linear-gradient(145deg, rgba(17, 26, 46, 0.76), rgba(8, 13, 25, 0.58));
   box-shadow: 0 32px 110px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
 }
 
 .hero-stage::before {
@@ -142,7 +148,6 @@ input {
 
 .hero-board {
   width: min(100%, 560px);
-  filter: drop-shadow(0 20px 36px rgba(0, 0, 0, 0.28));
 }
 
 .hero-grid-line {
@@ -160,7 +165,6 @@ input {
   stroke: var(--gold);
   stroke-width: 5;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 10px rgba(246, 200, 110, 0.6));
   animation: breathe 3.2s ease-in-out infinite;
 }
 
@@ -169,7 +173,6 @@ input {
   stroke-width: 4;
   stroke-linecap: round;
   stroke-dasharray: 9 9;
-  filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.55));
 }
 
 .hero-equation {
@@ -412,6 +415,7 @@ input {
   grid-template-columns: minmax(0, 1.18fr) minmax(380px, 0.82fr);
   gap: 18px;
   align-items: start;
+  overflow-anchor: none;
 }
 
 .visual-pane,
@@ -422,8 +426,8 @@ input {
     linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.028)),
     rgba(10, 16, 31, 0.82);
   padding: 20px;
-  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: none;
 }
 
 .teacher-panel {
@@ -525,8 +529,12 @@ input {
 
 .three-scene {
   position: relative;
+  height: clamp(300px, 38vw, 360px);
   min-height: 360px;
   overflow: hidden;
+  contain: layout paint size;
+  content-visibility: auto;
+  overflow-anchor: none;
   border-top: 1px solid rgba(216, 230, 243, 0.1);
   border-bottom: 1px solid rgba(216, 230, 243, 0.1);
   background:
@@ -607,6 +615,8 @@ input {
   aspect-ratio: 1 / 1;
   width: 100%;
   overflow: hidden;
+  contain: layout paint;
+  overflow-anchor: none;
   background:
     radial-gradient(circle at center, rgba(96, 165, 250, 0.10), transparent 50%),
     linear-gradient(145deg, rgba(11, 16, 32, 0.78), rgba(7, 11, 22, 0.92));
@@ -621,7 +631,7 @@ input {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.42);
+  box-shadow: inset 0 0 54px rgba(0, 0, 0, 0.36);
 }
 
 .grid-line {
@@ -635,7 +645,7 @@ input {
 }
 
 .vector-handle {
-  filter: drop-shadow(0 0 12px rgba(246, 200, 110, 0.55));
+  filter: drop-shadow(0 0 8px rgba(246, 200, 110, 0.42));
 }
 
 .control-grid {
@@ -717,8 +727,7 @@ input {
   color: rgb(241 245 249);
   font-family: "Times New Roman", serif;
   font-size: 15px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
 .teacher-cue {
@@ -805,7 +814,17 @@ input[type="range"] {
   border-radius: 22px;
   background: rgba(17, 26, 46, 0.5);
   padding: 17px;
-  backdrop-filter: blur(18px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .ai-tutor {
@@ -988,6 +1007,7 @@ input[type="range"] {
   }
 
   .three-scene {
+    height: 300px;
     min-height: 300px;
   }
 
